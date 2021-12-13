@@ -1,0 +1,21 @@
+This Text file contains a description of the variables and their content used in our project.
+
+emissions_per_person: Contains the original dataset as loaded as a CSV from Gapminder. This dataset contains the name of the countries and CO2 emissions per person in tonnes.
+
+emissions_years: This is the dataset "emissions_per_person" filtered, containing only the CO2 emissions per person for the selected years: 2002-2018
+
+updated_emissions: This is the dataset emissions_years, but with the format changed to longer from wider, containing the each observation in rows.
+
+gdp: Contains the original dataset as loaded as a CSV from Gapminder. This dataset contains the gdp per capita US inflation adjusted and the name of the countries.
+
+gdp_years: This is the dataset "gdp" filtered, containing only the gdp per capita for the selected years: 2002-2018
+
+gdp2: This is the dataset gdp_years, but with the format changed to longer from wider, containing the each observation in rows, and with the values listed as thousands instead of with "K" as in the original dataset.
+
+gdp_average: this dataframe contains the average gdp per capita for each country arranged in descending order
+
+richest_countries_co2: this dataframe is based on the average gdp and contains the five richest recorded countries' CO2 emissions (Qatar, United States of America, Luxembourg, Switzerland and Norway)
+
+poorest_countries_co2: this dataframe is based on the average gdp and contains the five poorest recorded countries' CO2 emissions (Central African Republic, Niger, Congo Dem. Rep., Malawi and Burundi).
+
+emissions_average: this dataframe contains the average CO2 emissions per person for each country arranged in descending order

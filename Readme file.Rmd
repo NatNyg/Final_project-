@@ -1,0 +1,21 @@
+---
+title: "Read me"
+authors: "Sofie Lloyd Thomsen & Natashia Nygaard"
+date: "Created 23 November, 2021, updated `r format(Sys.time(), '%d %B, %Y')`"
+output: html_document
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## This project 
+
+## Fetch the data from gapminder (CO2 emissions per person and gdp per capita s inflation adjusted), using the following link: https://www.gapminder.org/data/ 
+
+## Make sure you have R installed and ready to run the code (We used R (4.0.3) and RStudio (1.4.1717).)
+
+## Clone the repository from github and read it into R. Run the code, and you are good to go! Comments are included in the Rmd file. 
+
+

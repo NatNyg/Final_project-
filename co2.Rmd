@@ -1,0 +1,187 @@
+---
+title: "co2 emissions"
+authors: "Sofie Lloyd Thomsen & Natashia Nygaard"
+date: "Created 23 November, 2021, updated `r format(Sys.time(), '%d %B, %Y')`"
+output: html_document
+---
+
+First we read the necessary libraries
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(gapminder)
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+```
+
+
+We read the dataset CO2 emissions per person that we downloaded from gapminder into our environment:
+
+```{r}
+emissions_per_person <- read.csv("co2_emissions_tonnes_per_person.csv")
+```
+
+We then change the name of the first column to "Country" as this is easier to work with and more meaningful to the values. 
+
+```{r}
+colnames(emissions_per_person)[colnames(emissions_per_person) == "ï..country"] <- "Country"
+```
+
+
+We then choose the years we want to look into  (from 2002 until 2018, as this is where we have data on all countries)
+
+```{r}
+emissions_years <- emissions_per_person%>%select(Country,X2002,X2003,X2004,X2005,X2006,X2007,X2008,X2009,X2010,X2011,X2012,X2013,X2014,X2015,X2016,X2017,X2018)
+```
+
+We then use the pivot function to change from wider to longer format:
+
+```{r}
+updated_emissions <- emissions_years %>%
+  pivot_longer(
+    cols = starts_with("X"),
+    names_to = "Year",
+    names_prefix = "X",
+    values_to = "CO2_emissions_tonnes_per_person",
+    values_drop_na = TRUE
+  )
+```
+
+
+
+
+
+We then read in the gdp per capita data that we also downloaded from gapminder:
+
+```{r}
+gdp <- read.csv("gdppercapita_us_inflation_adjusted.csv")
+```
+
+
+Here we also change the coloumn name to "Country", as this is more meaningful and easier to work with than the original name:
+```{r}
+colnames(gdp)[colnames(gdp) == "ï..country"] <- "Country"
+```
+
+
+We select the same years as for emissions, in order to make able a comparison:
+```{r}
+gdp_years <- gdp%>%select(Country,X2002,X2003,X2004,X2005,X2006,X2007,X2008,X2009,X2010,X2011,X2012,X2013,X2014,X2015,X2016,X2017,X2018)
+```
+
+
+Once again we also change the dataframe from wider to longer format:
+```{r}
+gdp2 <- gdp_years %>%
+  pivot_longer(
+    cols = starts_with("X"),
+    names_to = "Year",
+    names_prefix = "X",
+    values_to = "Per_Capita_GDP",
+    values_drop_na = TRUE
+  )
+```
+
+
+
+We change the value "k" to thousands for smoother work process and more meaningful values:
+
+```{r}
+gdp2$Per_Capita_GDP<-as.numeric(sub("k", "e3", gdp2$Per_Capita_GDP, fixed = TRUE))
+```
+
+
+
+
+Using the mean function we can find the average gdp per capita for each year, enabling us to find the five poorest and wealthiest countries, arranging them in descending order. We also dropp all NA's:
+
+
+```{r}
+gdp_average <- gdp2 %>%
+  group_by(Country) %>% 
+  summarize(Average=mean(Per_Capita_GDP)) %>%
+  ungroup() %>% 
+  arrange(desc(Average)) %>% 
+  drop_na()
+
+  
+```
+
+
+Now we know the average GDP per capita from years 2002-2018. We can now find the five poorest and five most wealthy countries using head and tail. After using head we want to check our dataset to see if we have data on the co2 emissions for the richest and poorest countries. We find that we are lacking data from Monaco and Bermuda within the five richest countries - so we extract our tail until we find two more countries that can be found in the dataset. The next two countries that we have data on in the CO2 dataset is Qatar and United States (the 8th and 9th richest countries)
+
+```{r}
+head(gdp_average, n=9)
+```
+
+Using the tail function to find the five poorest countries:
+
+```{r}
+tail(gdp_average, n=5)
+```
+
+
+
+Now we want to visualize the development of the ten selected countries' co2 emission in the period 2002-2017. In order to do this we have to filter out the countries we want to work with, starting with the richest countries:
+
+```{r}
+richest_countries_co2<-updated_emissions%>% filter(Country=="Qatar"|Country=="United States"|Country=="Luxembourg"|Country=="Switzerland"|Country=="Norway")
+```
+
+
+Then doing the same for the poorest countries:
+
+```{r}
+poorest_countries_co2 <- updated_emissions%>%
+  filter(Country=="Central African Republic"|Country=="Niger"|Country=="Congo, Dem. Rep."|Country=="Malawi"|Country=="Burundi")
+```
+
+
+We then use ggplot to visualize the countries compared to each other, starting with the richest:
+
+```{r}
+ggplot(data=richest_countries_co2, aes(x=Year, y=CO2_emissions_tonnes_per_person, group=Country,color=Country)) +
+  geom_line(size=2.5)+
+  labs(y= "CO2 emissions tonnes per person")+
+  ggtitle("CO2 emissions in wealthiest countries over time")+
+  theme(axis.text.x = element_text(angle = 70, hjust = 1))
+```
+
+
+Then we do the same for the poorest countries:
+
+```{r}
+ggplot(data=poorest_countries_co2, aes(x=Year, y=CO2_emissions_tonnes_per_person, group=Country,color=Country)) +
+  geom_line(size=2.5)+
+  labs(y= "CO2 emissions tonnes per person")+
+  ggtitle("CO2 emissions in poorest countries over time")+
+  theme(axis.text.x = element_text(angle = 70, hjust = 1))
+
+```
+
+As we can see there is a big difference in the numbers - all the poorest countries have a much lower CO2-emission per person, than the richest countries.
+
+
+This is interesting - we now want to see which countries that has the biggest co2 emissions per person, to see if there is a general pattern of the most wealthiest countries having the biggest emission (average for each year):
+
+```{r}
+emissions_average <- updated_emissions %>%
+  group_by(Country) %>% 
+  summarize(Average=mean(CO2_emissions_tonnes_per_person)) %>%
+  ungroup() %>% 
+  arrange(desc(Average)) %>% 
+  drop_na()
+
+  
+```
+
+
+Now using the head function to see the five countries with the biggest CO2 emissions per person in average: 
+
+```{r}
+head(emissions_average,n=5)
+```
+
+This list shows, that the five countries with the biggest CO2 emissions per person in average is not the most wealthy, but instead some of the countries producing oil and/or other fossil fuels. 
+
+
